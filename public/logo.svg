@@ -1,0 +1,26 @@
+<svg width="130" height="155" viewBox="0 0 130 155" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cg1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3d25"/>
+      <stop offset="100%" stop-color="#0d1f11"/>
+    </linearGradient>
+    <linearGradient id="cgold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffe066"/>
+      <stop offset="100%" stop-color="#c89a00"/>
+    </linearGradient>
+  </defs>
+  <path d="M65 4 L122 26 L122 84 Q122 132 65 150 Q8 132 8 84 L8 26 Z" fill="url(#cg1)" stroke="#f5c400" stroke-width="2"/>
+  <path d="M65 11 L115 30 L115 84 Q115 126 65 143 Q15 126 15 84 L15 30 Z" fill="none" stroke="rgba(245,196,0,.2)" stroke-width="1"/>
+  <rect x="25" y="36" width="80" height="2" rx="1" fill="#f5c400" opacity=".3"/>
+  <text x="65" y="52" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="700" fill="rgba(255,255,255,.5)" letter-spacing="5">CUP</text>
+  <text x="65" y="100" text-anchor="middle" font-family="'Bebas Neue',cursive" font-size="52" fill="url(#cgold)" letter-spacing="3">SSG</text>
+  <circle cx="96" cy="57" r="9" fill="white" opacity=".9"/>
+  <circle cx="92.5" cy="54" r="2.5" fill="#222" opacity=".15"/>
+  <circle cx="99" cy="53" r="2" fill="#222" opacity=".12"/>
+  <circle cx="93" cy="59.5" r="2.2" fill="#222" opacity=".12"/>
+  <circle cx="99.5" cy="59" r="2" fill="#222" opacity=".1"/>
+  <text x="65" y="122" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="6.5" font-weight="700" fill="rgba(255,255,255,.3)" letter-spacing="2.5">SMALL SIDE GAME</text>
+  <text x="38" y="125" text-anchor="middle" font-size="6" fill="rgba(245,196,0,.35)">★</text>
+  <text x="92" y="125" text-anchor="middle" font-size="6" fill="rgba(245,196,0,.35)">★</text>
+  <rect x="25" y="128" width="80" height="1.5" rx=".75" fill="#f5c400" opacity=".2"/>
+</svg>
