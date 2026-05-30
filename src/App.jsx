@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from './supabase'
 import Header from './components/Header'
 import Hero from './components/Hero'
-import Om from './components/Om'
+import HvordanVirkerDet from './components/HvordanVirkerDet'
 import OpretTurnering from './components/OpretTurnering'
 import FAQ from './components/FAQ'
 import Footer from './components/Footer'
@@ -28,9 +28,9 @@ export default function App() {
   return (
     <div>
       <Header onAdminClick={() => setShowLogin(true)} />
-      <Hero />
-      <Om />
-      <OpretTurnering />
+      <Hero onLoginClick={() => setShowLogin(true)} />
+      <HvordanVirkerDet />
+      <OpretTurnering onLoginClick={() => setShowLogin(true)} />
       <FAQ />
       <Footer onAdminClick={() => setShowLogin(true)} />
       {showLogin && <Login onClose={() => setShowLogin(false)} onLogin={() => setShowLogin(false)} />}

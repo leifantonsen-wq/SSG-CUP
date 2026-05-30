@@ -12,6 +12,7 @@ const styles = {
 };
 
 const faqs = [
+  { q: 'Hvad betyder SSG?', a: 'SSG står for Small Sided Games — småsidede spil. Det er en anerkendt træningsform inden for fodbold hvor man spiller på mindre baner med færre spillere, hvilket giver flere boldberøringer og mere involvering for alle. SSG Cup bruger konceptet til turneringer hvor alle blandes på nye hold hver runde.' },
   { q: 'Hvad er Snickers Cup?', a: 'Snickers Cup er et turneringskoncept der opstod på DBU\'s fodboldskoler i 90\'erne. Konceptet går ud på at alle spillere blandes på nye hold hver runde — så alle spiller med og mod alle i løbet af turneringen. Det skaber fællesskab og sikrer at alle møder hinanden.' },
   { q: 'Hvad er SSG Cup?', a: 'SSG Cup er en gratis digital version af Snickers Cup-konceptet. Du indtaster dine spillere, vælger antal baner og runder — og får et komplet kampprogram på sekunder. Direkte i browseren, ingen konto eller download nødvendig.' },
   { q: 'Hvem kan bruge SSG Cup?', a: 'Alle der vil arrangere en turnering med det sociale blandekoncept — fodboldtrænere, lærere, pædagoger, lejrarrangører, firmaevent-koordinatorer og mange andre.' },
