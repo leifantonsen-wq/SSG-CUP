@@ -20,6 +20,7 @@ const styles = {
     fontSize: '1.6rem',
     letterSpacing: '3px',
     color: '#ffe066',
+    cursor: 'pointer',
   },
   logoSpan: {
     color: '#ffffff',
@@ -38,6 +39,8 @@ const styles = {
     color: 'rgba(255,255,255,0.7)',
     cursor: 'pointer',
     transition: 'color 0.2s',
+    background: 'none',
+    border: 'none',
   },
   cta: {
     background: '#ffe066',
@@ -52,30 +55,24 @@ const styles = {
     cursor: 'pointer',
     border: 'none',
   },
-  menuBtn: {
-    display: 'none',
-    background: 'none',
-    border: 'none',
-    color: '#ffe066',
-    fontSize: '1.5rem',
-    cursor: 'pointer',
-  },
+};
+
+const scrollTo = (id) => {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
 };
 
 export default function Header() {
-  const [open, setOpen] = useState(false);
-
   return (
     <header style={styles.header}>
-      <div style={styles.logo}>
+      <div style={styles.logo} onClick={() => scrollTo('top')}>
         SSG <span style={styles.logoSpan}>Cup</span>
       </div>
       <nav style={styles.nav}>
-        <span style={styles.navLink}>Om Turneringen</span>
-        <span style={styles.navLink}>Tilmelding</span>
-        <span style={styles.navLink}>Resultater</span>
-        <span style={styles.navLink}>Kontakt</span>
-        <button style={styles.cta}>Tilmeld din klub</button>
+        <button style={styles.navLink} onClick={() => scrollTo('om')}>Om Turneringen</button>
+        <button style={styles.navLink} onClick={() => scrollTo('tilmelding')}>Tilmelding</button>
+        <button style={styles.navLink} onClick={() => scrollTo('kontakt')}>Kontakt</button>
+        <button style={styles.cta} onClick={() => scrollTo('tilmelding')}>Tilmeld din klub</button>
       </nav>
     </header>
   );

@@ -117,7 +117,7 @@ export default function Tilmelding() {
   };
 
   return (
-    <section style={{ background: 'rgba(255,224,102,0.03)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+    <section id="tilmelding" style={{ background: 'rgba(255,224,102,0.03)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
       <div style={styles.section}>
         <div style={styles.label}>Kom med</div>
         <h2 style={styles.title}>Tilmeld din klub</h2>

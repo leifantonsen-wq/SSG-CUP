@@ -32,14 +32,8 @@ const styles = {
     letterSpacing: '4px',
     marginBottom: '1.5rem',
   },
-  titleYellow: {
-    color: '#ffe066',
-    display: 'block',
-  },
-  titleWhite: {
-    color: '#ffffff',
-    display: 'block',
-  },
+  titleYellow: { color: '#ffe066', display: 'block' },
+  titleWhite: { color: '#ffffff', display: 'block' },
   subtitle: {
     fontSize: 'clamp(1rem, 2vw, 1.2rem)',
     color: 'rgba(255,255,255,0.65)',
@@ -86,9 +80,7 @@ const styles = {
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
-  stat: {
-    textAlign: 'center',
-  },
+  stat: { textAlign: 'center' },
   statNumber: {
     fontFamily: "'Bebas Neue', cursive",
     fontSize: '3rem',
@@ -110,20 +102,16 @@ const styles = {
     background: 'rgba(255,255,255,0.15)',
     alignSelf: 'center',
   },
-  pitch: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: '200px',
-    background: 'linear-gradient(to top, rgba(13,31,17,0.8), transparent)',
-    pointerEvents: 'none',
-  },
+};
+
+const scrollTo = (id) => {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
 };
 
 export default function Hero() {
   return (
-    <section style={styles.hero}>
+    <section id="top" style={styles.hero}>
       <div style={styles.badge}>⚽ Genoplivet 2026</div>
       <h1 style={styles.title}>
         <span style={styles.titleYellow}>SSG</span>
@@ -133,8 +121,8 @@ export default function Hero() {
         Danmarks genoplivede fodboldturnering for klubber. Tilmeld din klub og vær med til at skrive historien — ligesom dengang.
       </p>
       <div style={styles.buttons}>
-        <button style={styles.btnPrimary}>Tilmeld din klub</button>
-        <button style={styles.btnSecondary}>Læs mere om turneringen</button>
+        <button style={styles.btnPrimary} onClick={() => scrollTo('tilmelding')}>Tilmeld din klub</button>
+        <button style={styles.btnSecondary} onClick={() => scrollTo('om')}>Læs mere om turneringen</button>
       </div>
       <div style={styles.stats}>
         <div style={styles.stat}>

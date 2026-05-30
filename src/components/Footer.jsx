@@ -46,7 +46,7 @@ const styles = {
 export default function Footer() {
   const year = new Date().getFullYear();
   return (
-    <footer style={styles.footer}>
+    <footer id="kontakt" style={styles.footer}>
       <div style={styles.logo}>SSG <span style={styles.logoSpan}>Cup</span></div>
       <div style={styles.tagline}>Danmarks fodboldturnering</div>
       <div style={styles.links}>

@@ -45,10 +45,7 @@ const styles = {
     borderRadius: '8px',
     padding: '1.5rem',
   },
-  cardIcon: {
-    fontSize: '1.8rem',
-    marginBottom: '0.75rem',
-  },
+  cardIcon: { fontSize: '1.8rem', marginBottom: '0.75rem' },
   cardTitle: {
     fontFamily: "'Bebas Neue', cursive",
     fontSize: '1.2rem',
@@ -72,7 +69,7 @@ const features = [
 
 export default function Om() {
   return (
-    <section style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+    <section id="om" style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
       <div style={styles.section}>
         <div style={styles.grid}>
           <div>
