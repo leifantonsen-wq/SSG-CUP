@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snickers Cup Generator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap');
+  :root {
+    --grass:#1a7a3c;--grass-light:#22a050;--grass-dark:#0f4d25;
+    --yellow:#f5c400;--yellow-light:#ffe066;--white:#f8f8f2;
+    --dark:#111a14;--card:#1e2b21;--border:#2d3f30;
+    --red:#e03c3c;--blue:#3c7be0;--orange:#e07a3c;
+    --purple:#9b5de5;--teal:#3cbfae;--pink:#e05c8a;--bench:#5a3e00;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--dark);color:var(--white);font-family:'DM Sans',sans-serif;min-height:100vh;
+    background-image:repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(255,255,255,.015) 40px,rgba(255,255,255,.015) 41px),
+    repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(255,255,255,.015) 40px,rgba(255,255,255,.015) 41px);}
+  header{background:linear-gradient(135deg,var(--grass-dark) 0%,var(--grass) 60%,var(--grass-light) 100%);
+    padding:1.5rem 2rem 2.5rem;position:relative;overflow:hidden;border-bottom:4px solid var(--yellow);}
+  header::before{content:'⚽';position:absolute;right:-20px;top:-20px;font-size:180px;opacity:.07;transform:rotate(-15deg);}
+  .logo{font-family:'Bebas Neue',cursive;font-size:3rem;letter-spacing:3px;color:var(--yellow);text-shadow:3px 3px 0 var(--grass-dark);}
+  .logo span{color:var(--white);}
+  .tagline{font-size:.85rem;color:rgba(255,255,255,.6);margin-top:.2rem;letter-spacing:1px;text-transform:uppercase;}
+  .container{max-width:960px;margin:0 auto;padding:1.5rem;}
+  .steps{display:flex;margin-bottom:1.5rem;}
+  .step{flex:1;padding:.6rem .5rem;background:var(--card);border:1px solid var(--border);text-align:center;
+    font-size:.75rem;color:rgba(255,255,255,.4);cursor:pointer;transition:all .2s;}
+  .step:first-child{border-radius:8px 0 0 8px;}
+  .step:last-child{border-radius:0 8px 8px 0;}
+  .step.active{background:var(--grass);color:var(--white);font-weight:600;border-color:var(--grass-light);}
+  .step .sn{display:block;font-family:'Bebas Neue',cursive;font-size:1.3rem;color:var(--yellow);line-height:1;}
+  .step.active .sn{color:var(--yellow-light);}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1.25rem;}
+  .card-title{font-family:'Bebas Neue',cursive;font-size:1.5rem;letter-spacing:2px;color:var(--yellow);margin-bottom:1rem;}
+  .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;}
+  .form-grid-3{grid-template-columns:repeat(3,1fr);}
+  .form-grid-4{grid-template-columns:repeat(4,1fr);}
+  .field label{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.5);margin-bottom:.35rem;font-weight:600;}
+  .field input,.field select{width:100%;background:var(--dark);border:2px solid var(--border);border-radius:8px;
+    color:var(--white);padding:.6rem .9rem;font-family:'DM Sans',sans-serif;font-size:.95rem;transition:border-color .2s;}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--grass-light);}
+  .field input[type="number"]{text-align:center;font-size:1.1rem;font-weight:600;}
+  .btn{padding:.7rem 1.5rem;border:none;border-radius:8px;font-family:'Bebas Neue',cursive;font-size:1.2rem;
+    letter-spacing:2px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem;}
+  .btn-primary{background:var(--yellow);color:var(--dark);}
+  .btn-primary:hover{background:var(--yellow-light);transform:translateY(-2px);}
+  .btn-green{background:var(--grass);color:var(--white);}
+  .btn-green:hover{background:var(--grass-light);transform:translateY(-2px);}
+  .btn-outline{background:transparent;color:var(--white);border:2px solid var(--border);}
+  .btn-outline:hover{border-color:var(--yellow);color:var(--yellow);}
+  .btn-sm{font-size:.9rem;padding:.4rem .9rem;}
+  .actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.25rem;}
+  .alert{padding:.7rem 1rem;border-radius:8px;font-size:.875rem;margin-bottom:1rem;}
+  .alert-info{background:rgba(60,191,174,.12);border:1px solid var(--teal);color:var(--teal);}
+  .alert-warn{background:rgba(245,196,0,.1);border:1px solid var(--yellow);color:var(--yellow);}
+  .section{display:none;} .section.active{display:block;}
+  .tabs{display:flex;gap:0;margin-bottom:1.25rem;border-bottom:2px solid var(--border);}
+  .tab{padding:.55rem 1rem;background:transparent;border:none;color:rgba(255,255,255,.4);
+    font-family:'DM Sans',sans-serif;font-size:.875rem;cursor:pointer;border-bottom:2px solid transparent;
+    margin-bottom:-2px;transition:all .15s;font-weight:500;}
+  .tab.active{color:var(--yellow);border-bottom-color:var(--yellow);}
+  /* Player grid */
+  .player-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;max-height:280px;overflow-y:auto;padding-right:.4rem;}
+  .player-input-wrap{display:flex;align-items:center;gap:.4rem;background:var(--dark);border:1px solid var(--border);border-radius:6px;padding:.35rem .6rem;}
+  .player-num{font-family:'Bebas Neue',cursive;font-size:1rem;color:var(--yellow);min-width:20px;}
+  .player-input-wrap input{background:transparent;border:none;color:var(--white);font-family:'DM Sans',sans-serif;font-size:.875rem;width:100%;padding:0;}
+  .player-input-wrap input:focus{outline:none;}
+  .player-input-wrap input::placeholder{color:rgba(255,255,255,.2);}
+  .toggle-wrap{display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem;font-size:.875rem;color:rgba(255,255,255,.7);}
+  .toggle{width:40px;height:22px;background:var(--border);border-radius:11px;cursor:pointer;position:relative;transition:background .2s;border:none;flex-shrink:0;}
+  .toggle.on{background:var(--grass);}
+  .toggle::after{content:'';position:absolute;width:16px;height:16px;background:white;border-radius:50%;top:3px;left:3px;transition:left .2s;}
+  .toggle.on::after{left:21px;}
+  /* Team colors */
+  .tc-0{background:#e03c3c;} .tc-1{background:#3c7be0;} .tc-2{background:#e07a3c;} .tc-3{background:#9b5de5;}
+  .tc-4{background:#3cbfae;} .tc-5{background:#e05c8a;} .tc-6{background:#1a7a3c;} .tc-7{background:#c8a000;color:#111!important;}
+  .team-badge{width:26px;height:26px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;
+    font-family:'Bebas Neue',cursive;font-size:.95rem;flex-shrink:0;color:white;}
+  /* Info bar */
+  .info-bar{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem;}
+  .info-pill{background:var(--grass-dark);border:1px solid var(--grass);border-radius:20px;padding:.35rem .9rem;
+    font-size:.8rem;display:flex;align-items:center;gap:.35rem;}
+  .info-pill strong{color:var(--yellow);font-family:'Bebas Neue',cursive;font-size:.95rem;}
+  /* Round blocks */
+  .round-block{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1rem;}
+  .round-header{background:var(--grass-dark);padding:.55rem 1rem;display:flex;justify-content:space-between;align-items:center;}
+  .round-title{font-family:'Bebas Neue',cursive;font-size:1.15rem;letter-spacing:2px;color:var(--yellow);}
+  .round-time{font-size:.8rem;color:rgba(255,255,255,.5);}
+  /* Match card - live */
+  .match-live{background:var(--dark);border-radius:10px;padding:1rem;margin-bottom:.75rem;}
+  .match-top{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;}
+  .match-team-block{flex:1;}
+  .match-team-name{font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:.4rem;}
+  .match-players-list{font-size:.75rem;color:rgba(255,255,255,.35);margin-top:.2rem;padding-left:30px;}
+  .score-wrap{display:flex;align-items:center;gap:.4rem;flex-shrink:0;}
+  .score-in{width:42px;height:42px;background:var(--card);border:2px solid var(--border);border-radius:8px;
+    color:var(--white);text-align:center;font-size:1.2rem;font-weight:700;font-family:'DM Sans',sans-serif;}
+  .score-in:focus{outline:none;border-color:var(--yellow);}
+  .score-sep{color:rgba(255,255,255,.3);font-weight:700;font-size:1.1rem;}
+  /* Goal buttons */
+  .goal-section{display:flex;gap:.75rem;flex-wrap:wrap;}
+  .goal-col{flex:1;min-width:0;}
+  .goal-col-title{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.3);margin-bottom:.35rem;}
+  .goal-btns{display:flex;flex-wrap:wrap;gap:.3rem;}
+  .goal-btn-wrap{display:flex;align-items:center;gap:.3rem;background:var(--card);border:1px solid var(--border);
+    border-radius:6px;padding:.25rem .5rem;font-size:.8rem;}
+  .goal-name{color:var(--white);}
+  .goal-count{background:var(--grass);color:white;border-radius:10px;padding:0 .4rem;font-size:.7rem;font-weight:700;}
+  .goal-pm{width:20px;height:20px;border:none;border-radius:4px;cursor:pointer;font-size:.85rem;font-weight:700;
+    display:flex;align-items:center;justify-content:center;line-height:1;transition:all .15s;}
+  .goal-plus{background:var(--grass);color:white;}
+  .goal-plus:hover{background:var(--grass-light);}
+  .goal-minus{background:var(--red);color:white;}
+  .goal-minus:hover{background:#ff5555;}
+  /* keep old .goal-btn for compat */
+  .goal-btn{padding:.25rem .6rem;background:var(--card);border:1px solid var(--border);border-radius:6px;
+    color:var(--white);font-family:'DM Sans',sans-serif;font-size:.8rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.25rem;}
+  .goal-btn:hover{border-color:var(--yellow);color:var(--yellow);}
+  /* MVP inline */
+  .mvp-inline{margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border);}
+  .mvp-inline-title{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.3);margin-bottom:.35rem;}
+  .mvp-btns{display:flex;flex-wrap:wrap;gap:.3rem;}
+  .mvp-btn{padding:.25rem .6rem;background:var(--card);border:1px solid var(--border);border-radius:6px;
+    color:var(--white);font-family:'DM Sans',sans-serif;font-size:.8rem;cursor:pointer;transition:all .15s;}
+  .mvp-btn:hover{border-color:var(--yellow);color:var(--yellow);}
+  .mvp-btn.voted{background:var(--yellow);color:var(--dark);border-color:var(--yellow);font-weight:600;}
+  /* Bench block */
+  .bench-block{background:rgba(90,62,0,.25);border:1px dashed var(--bench);border-radius:8px;
+    padding:.6rem 1rem;margin-bottom:.75rem;display:flex;align-items:center;gap:.75rem;}
+  .bench-label{font-family:'Bebas Neue',cursive;font-size:1rem;color:#e0a030;letter-spacing:1px;white-space:nowrap;}
+  .bench-players{font-size:.8rem;color:rgba(255,255,255,.45);flex:1;}
+  /* Standings */
+  .standings-table{width:100%;border-collapse:collapse;font-size:.875rem;}
+  .standings-table th{text-align:left;padding:.45rem .6rem;font-size:.7rem;text-transform:uppercase;
+    letter-spacing:1px;color:rgba(255,255,255,.4);border-bottom:1px solid var(--border);}
+  .standings-table td{padding:.55rem .6rem;border-bottom:1px solid rgba(255,255,255,.05);}
+  .standings-table tr:first-child td{background:rgba(245,196,0,.08);}
+  .pos-badge{width:22px;height:22px;border-radius:50%;background:var(--border);display:inline-flex;
+    align-items:center;justify-content:center;font-size:.75rem;font-weight:700;}
+  .pos-1{background:var(--yellow);color:var(--dark);}
+  .pos-2{background:#9e9e9e;color:var(--dark);}
+  .pos-3{background:#cd7f32;color:var(--dark);}
+  /* Scorers */
+  .scorer-row{display:flex;align-items:center;gap:.75rem;padding:.45rem .75rem;background:var(--dark);border-radius:8px;margin-bottom:.4rem;}
+  .scorer-rank{font-family:'Bebas Neue',cursive;font-size:1.2rem;color:var(--yellow);min-width:22px;text-align:center;}
+  .scorer-goals{margin-left:auto;background:var(--grass);color:white;border-radius:20px;padding:.1rem .55rem;font-size:.8rem;font-weight:700;}
+  /* Player sheets */
+  .player-sheets{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;}
+  .player-sheet{background:var(--dark);border:2px solid var(--border);border-radius:10px;padding:.85rem;text-align:center;}
+  .player-sheet-name{font-family:'Bebas Neue',cursive;font-size:1.2rem;color:var(--yellow);margin-bottom:.4rem;}
+  .player-round-row{display:flex;align-items:center;justify-content:space-between;font-size:.78rem;
+    padding:.2rem .4rem;border-radius:4px;background:rgba(255,255,255,.04);margin-bottom:.2rem;}
+  .player-round-label{color:rgba(255,255,255,.4);}
+  .player-round-team{font-family:'Bebas Neue',cursive;font-size:.95rem;width:24px;height:24px;
+    border-radius:4px;display:flex;align-items:center;justify-content:center;}
+  .bench-badge{font-size:.7rem;color:#e0a030;background:rgba(90,62,0,.4);border-radius:4px;padding:.1rem .4rem;}
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-track{background:var(--dark);}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+  @media print{
+    body{background:white!important;color:black!important;}
+    .no-print{display:none!important;}
+    .card{border:1px solid #ccc!important;background:white!important;color:black!important;break-inside:avoid;}
+    header{background:var(--grass)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .player-sheets{grid-template-columns:repeat(4,1fr);}
+    .player-sheet{border:1px solid #ccc!important;background:white!important;color:black!important;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div style="max-width:960px;margin:0 auto;padding:0;">
+    <div style="display:flex;align-items:center;gap:1rem;"><svg viewBox="0 0 80 80" width="52" height="52" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="fBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1e3d25"/><stop offset="100%" stop-color="#0d1f11"/></linearGradient><linearGradient id="fGold" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ffe066"/><stop offset="100%" stop-color="#c89a00"/></linearGradient></defs><rect width="80" height="80" rx="18" fill="url(#fBg)"/><path d="M40 5 L70 17 L70 46 Q70 68 40 75 Q10 68 10 46 L10 17 Z" fill="none" stroke="rgba(245,196,0,.3)" stroke-width="1.5"/><text x="40" y="54" text-anchor="middle" font-family="Bebas Neue,cursive" font-size="28" fill="url(#fGold)" letter-spacing="2">SSG</text><text x="40" y="32" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="7" font-weight="700" fill="rgba(255,255,255,.45)" letter-spacing="3">CUP</text></svg><div class="logo">SSG <span>Cup</span></div></div>
+    <div class="tagline">Turneringsgenerator · Bland spillerne hver runde</div>
+  </div>
+</header>
+<div class="container">
+
+  <!-- STEPS -->
+  <div class="steps no-print" id="stepsNav">
+    <div class="step active" onclick="goToStep(0)"><span class="sn">1</span>Opsætning</div>
+    <div class="step" onclick="goToStep(1)"><span class="sn">2</span>Spillere</div>
+    <div class="step" onclick="goToStep(2)"><span class="sn">3</span>Kampprogram</div>
+    <div class="step" onclick="goToStep(3)"><span class="sn">4</span>Live</div>
+    <div class="step" onclick="visHistorik()"><span class="sn">📁</span>Historik</div>
+  </div>
+
+  <!-- STEP 0 -->
+  <div class="section active" id="step0">
+    <div class="card">
+      <div class="card-title">⚙️ Turneringsopsætning</div>
+      <div class="form-grid form-grid-4" style="margin-bottom:.75rem;">
+        <div class="field"><label>Antal spillere</label><input type="number" id="numPlayers" value="16" min="4" max="80" oninput="updateSetup()"></div>
+        <div class="field"><label>Antal baner</label><input type="number" id="numPitches" value="4" min="1" max="12" oninput="updateSetup()"></div>
+        <div class="field"><label>Antal runder</label><input type="number" id="numRounds" value="5" min="2" max="10" oninput="updateSetup()"></div>
+        <div class="field"><label>Spillere per hold</label>
+          <select id="teamSize" oninput="updateSetup()">
+            <option value="0">Auto</option>
+            <option value="2">2 per hold (2v2)</option>
+            <option value="3">3 per hold (3v3)</option>
+            <option value="4">4 per hold (4v4)</option>
+            <option value="5" selected>5 per hold (5v5)</option>
+            <option value="6">6 per hold (6v6)</option>
+            <option value="7">7 per hold (7v7)</option>
+            <option value="8">8 per hold (8v8)</option>
+            <option value="9">9 per hold (9v9)</option>
+            <option value="11">11 per hold (11v11)</option>
+          </select>
+        </div>
+        <div class="field"><label>Kamplængde (min)</label><input type="number" id="matchLength" value="10" min="3" max="30"></div>
+        <div class="field"><label>Pause (min)</label><input type="number" id="breakLength" value="5" min="0" max="20"></div>
+        <div class="field"><label>Starttidspunkt</label><input type="time" id="startTime" value="10:00"></div>
+      </div>
+      <div id="setupInfo" class="alert alert-info"></div>
+      <div class="actions"><button class="btn btn-primary" onclick="goToStep(1)">Næste: Spillere →</button></div>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="section" id="step1">
+    <div class="card">
+      <div class="card-title">👥 Spillere</div>
+      <div class="toggle-wrap">
+        <button class="toggle" id="nameToggle" onclick="toggleNames()"></button>
+        <span>Tilføj spillernavne (valgfrit)</span>
+      </div>
+      <div id="playerNamesWrap" style="display:none;margin-bottom:1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;">
+          <span style="font-size:.8rem;color:rgba(255,255,255,.4);">Lad felterne stå tomme for at bruge numre</span>
+          <button class="btn btn-outline btn-sm" onclick="clearNames()">Ryd alle</button>
+        </div>
+        <div class="player-grid" id="playerGrid"></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-outline" onclick="goToStep(0)">← Tilbage</button>
+        <button class="btn btn-primary" onclick="generateTournament()">Generer turnering →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="section" id="step2">
+    <div id="infoBar" class="info-bar no-print"></div>
+    <div class="tabs no-print">
+      <button class="tab active" onclick="switchTab2('schedule')">📋 Kampprogram</button>
+      <button class="tab" onclick="switchTab2('sheets')">🏃 Spillersedler</button>
+    </div>
+    <div id="tabSchedule">
+      <div class="card"><div class="card-title">📋 Kampprogram</div><div id="scheduleDisplay"></div></div>
+    </div>
+    <div id="tabSheets" style="display:none;">
+      <div class="card">
+        <div class="card-title">🏃 Spillersedler</div>
+        <div class="alert alert-info" style="margin-bottom:1rem;">Print og giv én til hver spiller — eller skriv bogstaverne på armen! ✍️</div>
+        <div class="player-sheets" id="playerSheetsDisplay"></div>
+      </div>
+    </div>
+    <div class="actions no-print">
+      <button class="btn btn-outline" onclick="goToStep(1)">← Tilbage</button>
+      <button class="btn btn-green" onclick="goToStep(3)">▶ Start turnering</button>
+      <button class="btn btn-outline" onclick="doPrint()">🖨️ Print / PDF</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 LIVE -->
+  <div class="section" id="step3">
+    <div id="liveInfoBar" class="info-bar no-print"></div>
+    <div class="tabs no-print">
+      <button class="tab active" onclick="switchLiveTab('scores')">⚽ Resultater</button>
+      <button class="tab" onclick="switchLiveTab('standings')">🏆 Stilling</button>
+      <button class="tab" onclick="switchLiveTab('scorers')">👟 Topscorer</button>
+      <button class="tab" onclick="switchLiveTab('mvp')">⭐ MVP Stilling</button>
+    </div>
+    <div id="liveTabScores"><div id="liveSchedule"></div></div>
+    <div id="liveTabStandings" style="display:none;">
+      <div class="card"><div class="card-title">🏆 Spillerstilling</div><table class="standings-table" id="standingsTable"></table></div>
+    </div>
+    <div id="liveTabScorers" style="display:none;">
+      <div class="card"><div class="card-title">👟 Topscorer</div><div id="scorersList"></div></div>
+    </div>
+    <div id="liveTabMvp" style="display:none;">
+      <div class="card"><div class="card-title">⭐ MVP Stilling</div><div id="mvpStandings"></div></div>
+    </div>
+    <div class="actions no-print" style="margin-top:1.25rem;">
+      <button class="btn btn-outline" onclick="goToStep(2)">← Kampprogram</button>
+      <button class="btn btn-outline" onclick="doPrint()">🖨️ Print / PDF</button>
+      <button class="btn btn-primary" onclick="gemTurnering()">💾 Gem turnering</button>
+    </div>
+    <div id="gemBesked" style="display:none;margin-top:1rem;" class="alert alert-info"></div>
+  </div>
+
+  <!-- TIDLIGERE TURNERINGER -->
+  <div class="section" id="step4">
+    <div class="card">
+      <div class="card-title">📁 Tidligere turneringer</div>
+      <div id="tidligereList"></div>
+      <div class="actions" style="margin-top:1rem;">
+        <button class="btn btn-primary" onclick="goToStep(0)">+ Ny turnering</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+// ── STATE ──────────────────────────────────────────────────────
+const S = {
+  numPlayers:16, numPitches:4, numRounds:5, matchLength:10, breakLength:5,
+  startTime:'10:00', teamSize:5, useNames:false,
+  playerNames:[], tournament:null,
+  scores:{},        // key "r-b" -> {home:n, away:n}
+  goals:{},         // playerId -> count
+  mvp:{},           // key "r-b" -> playerId  (per match)
+  colors:['tc-0','tc-1','tc-2','tc-3','tc-4','tc-5','tc-6','tc-7'],
+  letters:['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P']
+};
+
+// ── SETUP ──────────────────────────────────────────────────────
+function updateSetup(){
+  S.numPlayers = parseInt(document.getElementById('numPlayers').value)||16;
+  S.numPitches = parseInt(document.getElementById('numPitches').value)||4;
+  S.numRounds  = parseInt(document.getElementById('numRounds').value)||5;
+  S.teamSize   = parseInt(document.getElementById('teamSize').value)||0;
+  const teams  = S.numPitches * 2;
+  const info   = document.getElementById('setupInfo');
+  if(S.teamSize===0){
+    const ppt = Math.floor(S.numPlayers/teams), rem = S.numPlayers%teams;
+    info.className='alert alert-info';
+    info.innerHTML=`🏟️ <strong>${teams} hold</strong> à ca. <strong>${ppt} spillere</strong>${rem>0?` · <span style="color:var(--yellow)">${rem} spiller(e) på bænk per runde</span>`:''} · <strong>${S.numPitches} baner</strong>`;
+  } else {
+    const needed=teams*S.teamSize, diff=S.numPlayers-needed;
+    if(diff===0){ info.className='alert alert-info'; info.innerHTML=`✅ Perfekt! <strong>${teams} hold × ${S.teamSize}</strong> = <strong>${needed} spillere</strong>`;}
+    else if(diff>0){ info.className='alert alert-warn'; info.innerHTML=`⚠️ <strong>${diff} spiller(e) sidder på bænken</strong> per runde og roterer ind`;}
+    else{ info.className='alert alert-warn'; info.innerHTML=`⚠️ Mangler <strong>${Math.abs(diff)} spiller(e)</strong> — reducer holdstørrelse eller tilføj spillere`;}
+  }
+}
+
+function toggleNames(){
+  S.useNames=!S.useNames;
+  document.getElementById('nameToggle').className='toggle'+(S.useNames?' on':'');
+  document.getElementById('playerNamesWrap').style.display=S.useNames?'block':'none';
+  if(S.useNames) buildGrid();
+}
+function buildGrid(){
+  S.numPlayers=parseInt(document.getElementById('numPlayers').value)||16;
+  const grid=document.getElementById('playerGrid');
+  const existing=[...grid.querySelectorAll('input')].map(i=>i.value);
+  grid.innerHTML='';
+  for(let i=0;i<S.numPlayers;i++){
+    const w=document.createElement('div'); w.className='player-input-wrap';
+    w.innerHTML=`<span class="player-num">${i+1}</span><input placeholder="Spiller ${i+1}" value="${existing[i]||''}">`;
+    grid.appendChild(w);
+  }
+}
+function clearNames(){ document.getElementById('playerGrid').querySelectorAll('input').forEach(i=>i.value=''); }
+function getName(i){
+  if(!S.useNames) return `#${i+1}`;
+  const inp=document.getElementById('playerGrid').querySelectorAll('input');
+  return (inp[i]&&inp[i].value.trim())||`#${i+1}`;
+}
+function getAllNames(){ return Array.from({length:S.numPlayers},(_,i)=>getName(i)); }
+
+// ── GENERATE ───────────────────────────────────────────────────
+function generateTournament(){
+  S.numPlayers = parseInt(document.getElementById('numPlayers').value)||16;
+  S.numPitches = parseInt(document.getElementById('numPitches').value)||4;
+  S.numRounds  = parseInt(document.getElementById('numRounds').value)||5;
+  S.matchLength= parseInt(document.getElementById('matchLength').value)||10;
+  S.breakLength= parseInt(document.getElementById('breakLength').value)||5;
+  S.startTime  = document.getElementById('startTime').value;
+  S.teamSize   = parseInt(document.getElementById('teamSize').value)||0;
+  S.playerNames= getAllNames();
+  S.scores={}; S.goals={}; S.mvp={};
+
+  const numTeams = S.numPitches * 2;
+  const ppt = S.teamSize>0 ? S.teamSize : Math.floor(S.numPlayers/numTeams);
+  const activePlayers = numTeams * ppt; // players on field per round
+  const benchCount = S.numPlayers - activePlayers;
+
+  // Build assignments: for each round, assign each player a team (0..numTeams-1) or -1 (bench)
+  // Strategy: create a pool of slots, shuffle per round with rotation
+  const players = Array.from({length:S.numPlayers},(_,i)=>i);
+  const assignments = []; // assignments[r][playerIdx] = teamIdx or -1
+
+  for(let r=0;r<S.numRounds;r++){
+    // Build slot pool: activePlayers slots
+    const pool=[];
+    for(let t=0;t<numTeams;t++) for(let k=0;k<ppt;k++) pool.push(t);
+    // bench slots
+    for(let b=0;b<benchCount;b++) pool.push(-1);
+    // Shuffle pool with seeded rotation to maximise mixing
+    const shuffled=pool.slice().sort(()=>Math.random()-.5);
+    // Further rotate by r to ensure different benching each round
+    const rotated=[...shuffled.slice(r%shuffled.length),...shuffled.slice(0,r%shuffled.length)];
+    assignments.push(rotated);
+  }
+
+  // Build schedule
+  const schedule=[];
+  let curTime=parseTime(S.startTime);
+  for(let r=0;r<S.numRounds;r++){
+    const matches=[];
+    const benched=players.filter(p=>assignments[r][p]===-1);
+    for(let b=0;b<S.numPitches;b++){
+      const homeTeam=b*2, awayTeam=b*2+1;
+      const homePl=players.filter(p=>assignments[r][p]===homeTeam);
+      const awayPl=players.filter(p=>assignments[r][p]===awayTeam);
+      matches.push({round:r,pitch:b,homeTeam,awayTeam,homePlayers:homePl,awayPlayers:awayPl,time:formatTime(curTime)});
+    }
+    schedule.push({round:r,matches,benched,time:formatTime(curTime)});
+    curTime+=S.matchLength+S.breakLength;
+  }
+
+  S.tournament={numTeams,ppt,benchCount,assignments,schedule,names:S.playerNames};
+  renderAll();
+  goToStep(2);
+}
+
+function parseTime(s){ const[h,m]=s.split(':').map(Number); return h*60+m; }
+function formatTime(m){ return `${String(Math.floor(m/60)%24).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`; }
+
+// ── RENDER ALL ─────────────────────────────────────────────────
+function renderAll(){
+  renderInfoBar('infoBar');
+  renderInfoBar('liveInfoBar');
+  renderSchedule();
+  renderPlayerSheets();
+  renderLiveScores();
+  renderStandings();
+  renderScorers();
+}
+
+function renderInfoBar(id){
+  const el=document.getElementById(id); if(!el||!S.tournament) return;
+  const total=S.numRounds*(S.matchLength+S.breakLength)-S.breakLength;
+  el.innerHTML=`
+    <div class="info-pill">👥 <strong>${S.numPlayers}</strong> spillere</div>
+    <div class="info-pill">🏟️ <strong>${S.numPitches}</strong> baner</div>
+    <div class="info-pill">🔄 <strong>${S.numRounds}</strong> runder</div>
+    <div class="info-pill">⏱ <strong>${S.matchLength}</strong> min/kamp</div>
+    <div class="info-pill">🕐 Ca. <strong>${total}</strong> min i alt</div>
+  `;
+}
+
+// ── SCHEDULE VIEW ──────────────────────────────────────────────
+function renderSchedule(){
+  const el=document.getElementById('scheduleDisplay'); if(!el||!S.tournament) return;
+  const {schedule,names}=S.tournament;
+  let html='<div>';
+  schedule.forEach(rnd=>{
+    html+=`<div class="round-block">
+      <div class="round-header"><span class="round-title">Runde ${rnd.round+1}</span><span class="round-time">⏰ ${rnd.time}</span></div>
+      <div style="padding:.75rem;">`;
+    // Bench notice
+    if(rnd.benched.length>0){
+      html+=`<div class="bench-block">
+        <span class="bench-label">🪑 Bænk</span>
+        <span class="bench-players">${rnd.benched.map(p=>names[p]).join(' · ')}</span>
+      </div>`;
+    }
+    html+=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.5rem;">`;
+    rnd.matches.forEach(m=>{
+      const hC=S.colors[m.homeTeam%S.colors.length], aC=S.colors[m.awayTeam%S.colors.length];
+      const hL=S.letters[m.homeTeam], aL=S.letters[m.awayTeam];
+      html+=`<div style="background:var(--dark);border-radius:8px;padding:.65rem .85rem;">
+        <div style="font-size:.7rem;color:rgba(255,255,255,.3);margin-bottom:.35rem;">Bane ${m.pitch+1}</div>
+        <div style="display:flex;align-items:center;gap:.5rem;font-weight:600;font-size:.9rem;margin-bottom:.3rem;">
+          <div class="team-badge ${hC}">${hL}</div><span>${hL}</span>
+          <span style="color:rgba(255,255,255,.25);font-size:.75rem;">vs</span>
+          <div class="team-badge ${aC}">${aL}</div><span>${aL}</span>
+        </div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.3);">${m.homePlayers.map(p=>names[p]).join(', ')}</div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.3);">${m.awayPlayers.map(p=>names[p]).join(', ')}</div>
+      </div>`;
+    });
+    html+=`</div></div></div>`;
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+// ── PLAYER SHEETS ──────────────────────────────────────────────
+function renderPlayerSheets(){
+  const el=document.getElementById('playerSheetsDisplay'); if(!el||!S.tournament) return;
+  const {assignments,schedule,names}=S.tournament;
+  let html='';
+  for(let p=0;p<S.numPlayers;p++){
+    html+=`<div class="player-sheet"><div class="player-sheet-name">${names[p]}</div><div>`;
+    for(let r=0;r<S.numRounds;r++){
+      const t=assignments[r][p];
+      const m=t>=0?schedule[r].matches.find(m=>m.homeTeam===t||m.awayTeam===t):null;
+      const pitch=m?m.pitch+1:'—';
+      if(t===-1){
+        html+=`<div class="player-round-row"><span class="player-round-label">Runde ${r+1}</span><span class="bench-badge">BÆNK</span></div>`;
+      } else {
+        const letter=S.letters[t], color=S.colors[t%S.colors.length];
+        html+=`<div class="player-round-row">
+          <span class="player-round-label">R${r+1}</span>
+          <span style="font-size:.7rem;color:rgba(255,255,255,.3)">Bane ${pitch}</span>
+          <div class="player-round-team ${color}">${letter}</div>
+        </div>`;
+      }
+    }
+    html+=`</div></div>`;
+  }
+  el.innerHTML=html;
+}
+
+// ── LIVE SCORES ─────────────────────────────────────────────────
+function renderLiveScores(){
+  const el=document.getElementById('liveSchedule'); if(!el||!S.tournament) return;
+  const {schedule,names}=S.tournament;
+  let html='';
+  schedule.forEach(rnd=>{
+    html+=`<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;">
+        <div class="card-title" style="margin-bottom:0;">Runde ${rnd.round+1}</div>
+        <span style="color:rgba(255,255,255,.4);font-size:.8rem;">⏰ ${rnd.time}</span>
+      </div>`;
+
+    // Bench notice - prominent
+    if(rnd.benched.length>0){
+      html+=`<div class="bench-block" style="margin-bottom:.75rem;">
+        <span class="bench-label">🪑 Sidder over</span>
+        <span class="bench-players">${rnd.benched.map(p=>`<strong style="color:rgba(255,255,255,.6)">${names[p]}</strong>`).join(' · ')}</span>
+      </div>`;
+    }
+
+    rnd.matches.forEach(m=>{
+      const sk=`${rnd.round}-${m.pitch}`;
+      const sc=S.scores[sk]||{home:'',away:''};
+      const hC=S.colors[m.homeTeam%S.colors.length], aC=S.colors[m.awayTeam%S.colors.length];
+      const hL=S.letters[m.homeTeam], aL=S.letters[m.awayTeam];
+      const mvpKey=sk, mvpVoted=S.mvp[mvpKey];
+      const allPl=[...m.homePlayers,...m.awayPlayers];
+
+      html+=`<div class="match-live">
+        <!-- Teams + Score -->
+        <div class="match-top">
+          <div class="match-team-block">
+            <div class="match-team-name"><div class="team-badge ${hC}">${hL}</div> Hold ${hL}</div>
+            <div class="match-players-list">${m.homePlayers.map(p=>names[p]).join(', ')}</div>
+          </div>
+          <div class="score-wrap">
+            <input class="score-in" type="number" min="0" max="99" value="${sc.home}" placeholder="—"
+              onchange="updateScore('${sk}','home',this.value)">
+            <span class="score-sep">:</span>
+            <input class="score-in" type="number" min="0" max="99" value="${sc.away}" placeholder="—"
+              onchange="updateScore('${sk}','away',this.value)">
+          </div>
+          <div class="match-team-block" style="text-align:right;">
+            <div class="match-team-name" style="justify-content:flex-end;"><div class="team-badge ${aC}">${aL}</div> Hold ${aL}</div>
+            <div class="match-players-list">${m.awayPlayers.map(p=>names[p]).join(', ')}</div>
+          </div>
+        </div>
+
+        <!-- Goal scorers -->
+        <div class="goal-section">
+          <div class="goal-col">
+            <div class="goal-col-title">⚽ Mål for hold ${hL}</div>
+            <div class="goal-btns">
+              ${m.homePlayers.map(p=>`
+                <div class="goal-btn-wrap">
+                  <span class="goal-name">${names[p]}</span>
+                  ${S.goals[p]?`<span class="goal-count">${S.goals[p]}</span>`:''}
+                  <button class="goal-pm goal-plus" onclick="addGoal(${p})">+</button>
+                  ${S.goals[p]?`<button class="goal-pm goal-minus" onclick="removeGoal(${p})">−</button>`:''}
+                </div>`).join('')}
+            </div>
+          </div>
+          <div class="goal-col">
+            <div class="goal-col-title">⚽ Mål for hold ${aL}</div>
+            <div class="goal-btns">
+              ${m.awayPlayers.map(p=>`
+                <div class="goal-btn-wrap">
+                  <span class="goal-name">${names[p]}</span>
+                  ${S.goals[p]?`<span class="goal-count">${S.goals[p]}</span>`:''}
+                  <button class="goal-pm goal-plus" onclick="addGoal(${p})">+</button>
+                  ${S.goals[p]?`<button class="goal-pm goal-minus" onclick="removeGoal(${p})">−</button>`:''}
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- MVP per match -->
+        <div class="mvp-inline">
+          <div class="mvp-inline-title">⭐ Kampens spiller — Bane ${m.pitch+1}</div>
+          <div class="mvp-btns">
+            ${allPl.map(p=>`
+              <button class="mvp-btn ${mvpVoted===p?'voted':''}" onclick="voteMVP('${mvpKey}',${p})">
+                ${mvpVoted===p?'⭐ ':''}${names[p]}
+              </button>`).join('')}
+          </div>
+          ${mvpVoted!==undefined?`<div style="margin-top:.35rem;font-size:.8rem;color:var(--yellow);">⭐ ${names[mvpVoted]}</div>`:''}
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+  el.innerHTML=html;
+}
+
+function updateScore(key,side,val){
+  if(!S.scores[key]) S.scores[key]={home:0,away:0};
+  S.scores[key][side]=parseInt(val)||0;
+  renderStandings();
+}
+
+function addGoal(pid){
+  S.goals[pid]=(S.goals[pid]||0)+1;
+  renderLiveScores();
+  renderScorers();
+}
+
+function removeGoal(pid){
+  if(!S.goals[pid]||S.goals[pid]<=0){S.goals[pid]=0;return;}
+  S.goals[pid]--;
+  if(S.goals[pid]===0) delete S.goals[pid];
+  renderLiveScores();
+  renderScorers();
+}
+
+function voteMVP(key,pid){
+  S.mvp[key]=pid;
+  renderLiveScores();
+}
+
+// ── STANDINGS (per player) ─────────────────────────────────────
+function renderStandings(){
+  const el=document.getElementById('standingsTable'); if(!el||!S.tournament) return;
+  const {schedule,names}=S.tournament;
+
+  // Per-player stats
+  const stats={};
+  for(let p=0;p<S.numPlayers;p++) stats[p]={w:0,d:0,l:0,gf:0,ga:0,pts:0,played:0};
+
+  Object.entries(S.scores).forEach(([key,score])=>{
+    const [r,b]=key.split('-').map(Number);
+    const match=schedule[r]?.matches[b]; if(!match) return;
+    const hg=parseInt(score.home)||0, ag=parseInt(score.away)||0;
+    const process=(players,gf,ga)=>{
+      players.forEach(p=>{
+        stats[p].gf+=gf; stats[p].ga+=ga; stats[p].played++;
+        if(gf>ga){stats[p].w++;stats[p].pts+=3;}
+        else if(gf<ga){stats[p].l++;}
+        else{stats[p].d++;stats[p].pts++;}
+      });
+    };
+    process(match.homePlayers,hg,ag);
+    process(match.awayPlayers,ag,hg);
+  });
+
+  const sorted=Object.entries(stats)
+    .sort((a,b)=>b[1].pts-a[1].pts||(b[1].gf-b[1].ga)-(a[1].gf-a[1].ga)||b[1].gf-a[1].gf)
+    .slice(0,20);
+
+  let html=`<thead><tr><th>#</th><th>Spiller</th><th>K</th><th>V</th><th>U</th><th>T</th><th>MF</th><th>MM</th><th>Pts</th></tr></thead><tbody>`;
+  sorted.forEach(([pid,s],i)=>{
+    const pc=i===0?'pos-1':i===1?'pos-2':i===2?'pos-3':'';
+    const goals=S.goals[pid]||0;
+    html+=`<tr>
+      <td><span class="pos-badge ${pc}">${i+1}</span></td>
+      <td><strong>${names[pid]}</strong></td>
+      <td>${s.played}</td><td>${s.w}</td><td>${s.d}</td><td>${s.l}</td>
+      <td>${s.gf}</td><td>${s.ga}</td>
+      <td><strong>${s.pts}</strong></td>
+    </tr>`;
+  });
+  html+=`</tbody>`;
+  el.innerHTML=html;
+}
+
+// ── SCORERS ─────────────────────────────────────────────────────
+function renderScorers(){
+  const el=document.getElementById('scorersList'); if(!el) return;
+  const sorted=Object.entries(S.goals).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  if(!sorted.length){
+    el.innerHTML=`<div style="color:rgba(255,255,255,.3);text-align:center;padding:2rem;">Ingen mål registreret endnu</div>`;
+    return;
+  }
+  el.innerHTML=sorted.map(([pid,g],i)=>`
+    <div class="scorer-row">
+      <span class="scorer-rank">${i+1}</span>
+      <span>${S.playerNames[parseInt(pid)]}</span>
+      <span class="scorer-goals">⚽ ${g}</span>
+    </div>`).join('');
+}
+
+// ── MVP STANDINGS ───────────────────────────────────────────────
+function renderMvpStandings(){
+  const el=document.getElementById('mvpStandings'); if(!el||!S.tournament) return;
+  const names=S.tournament.names;
+  // Count MVP votes per player
+  const votes={};
+  Object.values(S.mvp).forEach(pid=>{
+    if(pid===undefined) return;
+    votes[pid]=(votes[pid]||0)+1;
+  });
+  if(!Object.keys(votes).length){
+    el.innerHTML=`<div style="color:rgba(255,255,255,.3);text-align:center;padding:2rem;">Ingen MVP stemmer endnu — stem på kampens spiller under Resultater</div>`;
+    return;
+  }
+  const sorted=Object.entries(votes).sort((a,b)=>b[1]-a[1]);
+  el.innerHTML=sorted.map(([pid,v],i)=>{
+    const pc=i===0?'pos-1':i===1?'pos-2':i===2?'pos-3':'';
+    return `<div class="scorer-row">
+      <span class="scorer-rank"><span class="pos-badge ${pc}">${i+1}</span></span>
+      <span><strong>${names[parseInt(pid)]}</strong></span>
+      <span class="scorer-goals" style="background:var(--yellow);color:var(--dark);">⭐ ${v} ${v===1?'stemme':'stemmer'}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── TABS ─────────────────────────────────────────────────────────
+function switchTab2(tab){
+  document.getElementById('tabSchedule').style.display=tab==='schedule'?'block':'none';
+  document.getElementById('tabSheets').style.display=tab==='sheets'?'block':'none';
+  document.querySelectorAll('#step2 .tab').forEach((t,i)=>t.className='tab'+((i===0&&tab==='schedule')||(i===1&&tab==='sheets')?' active':''));
+}
+
+function switchLiveTab(tab){
+  ['scores','standings','scorers','mvp'].forEach(t=>{
+    document.getElementById(`liveTab${t.charAt(0).toUpperCase()+t.slice(1)}`).style.display=t===tab?'block':'none';
+  });
+  document.querySelectorAll('#step3 .tab').forEach((t,i)=>t.className='tab'+(['scores','standings','scorers','mvp'][i]===tab?' active':''));
+  if(tab==='standings') renderStandings();
+  if(tab==='scorers') renderScorers();
+  if(tab==='mvp') renderMvpStandings();
+}
+
+// ── NAV ──────────────────────────────────────────────────────────
+function goToStep(n){
+  document.querySelectorAll('.section').forEach((s,i)=>s.className='section'+(i===n?' active':''));
+  document.querySelectorAll('.step').forEach((s,i)=>s.className='step'+(i===n?' active':''));
+}
+
+// ── PRINT / PDF ──────────────────────────────────────────────────
+function doPrint(){ window.print(); }
+
+// ── GEM TURNERING ─────────────────────────────────────────────────
+function gemTurnering(){
+  if(!S.tournament){ alert('Ingen turnering at gemme endnu'); return; }
+
+  const navn = prompt('Giv turneringen et navn (fx SSG Cup U11 — Kolding 2026):');
+  if(!navn) return;
+
+  const data = {
+    id: Date.now(),
+    navn,
+    dato: new Date().toLocaleDateString('da-DK'),
+    numPlayers: S.numPlayers,
+    numRounds: S.numRounds,
+    numPitches: S.numPitches,
+    scores: S.scores,
+    goals: S.goals,
+    mvp: S.mvp,
+    playerNames: S.playerNames,
+    tournament: S.tournament,
+  };
+
+  const gemt = JSON.parse(localStorage.getItem('ssgcup_turneringer')||'[]');
+  gemt.unshift(data);
+  localStorage.setItem('ssgcup_turneringer', JSON.stringify(gemt));
+
+  const besked = document.getElementById('gemBesked');
+  besked.style.display = 'block';
+  besked.innerHTML = `✅ <strong>${navn}</strong> er gemt!`;
+  setTimeout(()=>{ besked.style.display='none'; }, 3000);
+}
+
+// ── VIS HISTORIK ──────────────────────────────────────────────────
+function visHistorik(){
+  document.querySelectorAll('.section').forEach((s,i)=>s.className='section'+(i===4?' active':''));
+  document.querySelectorAll('.step').forEach((s,i)=>s.className='step'+(i===4?' active':''));
+
+  const gemt = JSON.parse(localStorage.getItem('ssgcup_turneringer')||'[]');
+  const el = document.getElementById('tidligereList');
+
+  if(!gemt.length){
+    el.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,.3);">Ingen gemte turneringer endnu</div>';
+    return;
+  }
+
+  el.innerHTML = gemt.map((t,i) => `
+    <div style="background:var(--dark);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+      <div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:1.2rem;color:var(--yellow);letter-spacing:2px;">${t.navn}</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.4);margin-top:.2rem;">
+          📅 ${t.dato} · 👥 ${t.numPlayers} spillere · 🏟️ ${t.numPitches} baner · 🔄 ${t.numRounds} runder
+        </div>
+      </div>
+      <div style="display:flex;gap:.5rem;">
+        <button class="btn btn-green btn-sm" onclick="indlaesurnering(${i})">▶ Genindlæs</button>
+        <button class="btn btn-outline btn-sm" onclick="sletTurnering(${i})" style="color:var(--red);border-color:var(--red);">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function indlaesurnering(idx){
+  const gemt = JSON.parse(localStorage.getItem('ssgcup_turneringer')||'[]');
+  const t = gemt[idx];
+  if(!t) return;
+
+  S.numPlayers = t.numPlayers;
+  S.numRounds = t.numRounds;
+  S.numPitches = t.numPitches;
+  S.scores = t.scores;
+  S.goals = t.goals;
+  S.mvp = t.mvp;
+  S.playerNames = t.playerNames;
+  S.tournament = t.tournament;
+
+  renderAll();
+  goToStep(3);
+}
+
+function sletTurnering(idx){
+  if(!confirm('Er du sikker på at du vil slette denne turnering?')) return;
+  const gemt = JSON.parse(localStorage.getItem('ssgcup_turneringer')||'[]');
+  gemt.splice(idx,1);
+  localStorage.setItem('ssgcup_turneringer', JSON.stringify(gemt));
+  visHistorik();
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+updateSetup();
+</script>
+</body>
+</html>
