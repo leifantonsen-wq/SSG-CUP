@@ -3,7 +3,8 @@ import { supabase } from './supabase'
 import Header from './components/Header'
 import Hero from './components/Hero'
 import Om from './components/Om'
-import Tilmelding from './components/Tilmelding'
+import OpretTurnering from './components/OpretTurnering'
+import FAQ from './components/FAQ'
 import Footer from './components/Footer'
 import Login from './components/Login'
 import AdminPanel from './components/AdminPanel'
@@ -22,16 +23,15 @@ export default function App() {
     return () => subscription.unsubscribe()
   }, [])
 
-  if (user) {
-    return <AdminPanel onLogout={() => setUser(null)} />
-  }
+  if (user) return <AdminPanel onLogout={() => setUser(null)} />
 
   return (
     <div>
       <Header onAdminClick={() => setShowLogin(true)} />
       <Hero />
       <Om />
-      <Tilmelding />
+      <OpretTurnering />
+      <FAQ />
       <Footer onAdminClick={() => setShowLogin(true)} />
       {showLogin && <Login onClose={() => setShowLogin(false)} onLogin={() => setShowLogin(false)} />}
     </div>

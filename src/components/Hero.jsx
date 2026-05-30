@@ -8,7 +8,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     textAlign: 'center',
-    padding: '8rem 2rem 4rem',
+    padding: '7rem 1.25rem 3rem',
     position: 'relative',
     overflow: 'hidden',
     background: 'radial-gradient(ellipse at 50% 30%, #2a5235 0%, #1e3d25 40%, #0d1f11 100%)',
@@ -23,48 +23,57 @@ const styles = {
     letterSpacing: '2px',
     textTransform: 'uppercase',
     color: '#ffe066',
-    marginBottom: '2rem',
+    marginBottom: '1.5rem',
   },
   title: {
     fontFamily: "'Bebas Neue', cursive",
-    fontSize: 'clamp(4rem, 12vw, 10rem)',
+    fontSize: 'clamp(3rem, 14vw, 9rem)',
     lineHeight: '0.9',
     letterSpacing: '4px',
-    marginBottom: '1.5rem',
+    marginBottom: '1.25rem',
   },
   titleYellow: { color: '#ffe066', display: 'block' },
   titleWhite: { color: '#ffffff', display: 'block' },
   subtitle: {
-    fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+    fontSize: 'clamp(0.95rem, 2.5vw, 1.15rem)',
     color: 'rgba(255,255,255,0.65)',
-    maxWidth: '560px',
+    maxWidth: '540px',
     lineHeight: '1.7',
-    marginBottom: '3rem',
+    marginBottom: '0.75rem',
+  },
+  origin: {
+    fontSize: '0.8rem',
+    color: 'rgba(255,224,102,0.6)',
+    marginBottom: '2.5rem',
+    letterSpacing: '0.5px',
   },
   buttons: {
     display: 'flex',
-    gap: '1rem',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
+    flexDirection: 'column',
+    gap: '0.75rem',
+    width: '100%',
+    maxWidth: '320px',
+    marginBottom: '3rem',
   },
   btnPrimary: {
     background: '#ffe066',
     color: '#0d1f11',
-    padding: '0.9rem 2.2rem',
-    borderRadius: '4px',
+    padding: '1rem 2rem',
+    borderRadius: '6px',
     fontFamily: "'DM Sans', sans-serif",
-    fontSize: '0.9rem',
+    fontSize: '1rem',
     fontWeight: '700',
     letterSpacing: '1px',
     textTransform: 'uppercase',
     border: 'none',
     cursor: 'pointer',
+    width: '100%',
   },
   btnSecondary: {
     background: 'transparent',
     color: '#ffffff',
-    padding: '0.9rem 2.2rem',
-    borderRadius: '4px',
+    padding: '1rem 2rem',
+    borderRadius: '6px',
     fontFamily: "'DM Sans', sans-serif",
     fontSize: '0.9rem',
     fontWeight: '600',
@@ -72,35 +81,36 @@ const styles = {
     textTransform: 'uppercase',
     border: '1px solid rgba(255,255,255,0.3)',
     cursor: 'pointer',
+    width: '100%',
   },
   stats: {
-    display: 'flex',
-    gap: '3rem',
-    marginTop: '5rem',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '0.75rem',
+    width: '100%',
+    maxWidth: '380px',
   },
-  stat: { textAlign: 'center' },
+  stat: {
+    background: 'rgba(255,255,255,0.04)',
+    border: '1px solid rgba(255,224,102,0.1)',
+    borderRadius: '10px',
+    padding: '0.9rem 0.75rem',
+    textAlign: 'center',
+  },
   statNumber: {
     fontFamily: "'Bebas Neue', cursive",
-    fontSize: '3rem',
+    fontSize: '1.8rem',
     color: '#ffe066',
     letterSpacing: '2px',
     lineHeight: '1',
   },
   statLabel: {
-    fontSize: '0.75rem',
+    fontSize: '0.7rem',
     fontWeight: '600',
-    letterSpacing: '2px',
+    letterSpacing: '1px',
     textTransform: 'uppercase',
-    color: 'rgba(255,255,255,0.45)',
-    marginTop: '0.3rem',
-  },
-  divider: {
-    width: '1px',
-    height: '50px',
-    background: 'rgba(255,255,255,0.15)',
-    alignSelf: 'center',
+    color: 'rgba(255,255,255,0.4)',
+    marginTop: '0.25rem',
   },
 };
 
@@ -112,37 +122,41 @@ const scrollTo = (id) => {
 export default function Hero() {
   return (
     <section id="top" style={styles.hero}>
-      <div style={styles.badge}>⚽ Genoplivet 2026</div>
+      <div style={styles.badge}>⚽ Det klassiske blandekoncept — nu digitalt</div>
       <h1 style={styles.title}>
-        <span style={styles.titleYellow}>SSG</span>
-        <span style={styles.titleWhite}>Cup</span>
+        <span style={styles.titleYellow}>Bland</span>
+        <span style={styles.titleWhite}>spillerne</span>
       </h1>
       <p style={styles.subtitle}>
-        Danmarks genoplivede fodboldturnering for klubber. Tilmeld din klub og vær med til at skrive historien — ligesom dengang.
+        Indtast dine spillere og få et komplet turneringsprogram på sekunder — alle spiller med og mod alle, hver runde.
+      </p>
+      <p style={styles.origin}>
+        Baseret på Snickers Cup-konceptet fra DBU's fodboldskoler i 90'erne
       </p>
       <div style={styles.buttons}>
-        <button style={styles.btnPrimary} onClick={() => scrollTo('tilmelding')}>Tilmeld din klub</button>
-        <button style={styles.btnSecondary} onClick={() => scrollTo('om')}>Læs mere om turneringen</button>
+        <button style={styles.btnPrimary} onClick={() => scrollTo('opret')}>
+          ⚽ Opret turnering nu — gratis
+        </button>
+        <button style={styles.btnSecondary} onClick={() => scrollTo('om')}>
+          Se hvordan det virker
+        </button>
       </div>
       <div style={styles.stats}>
         <div style={styles.stat}>
-          <div style={styles.statNumber}>32+</div>
-          <div style={styles.statLabel}>Klubber tilmeldt</div>
+          <div style={styles.statNumber}>2 min</div>
+          <div style={styles.statLabel}>Fra idé til kampprogram</div>
         </div>
-        <div style={styles.divider} />
         <div style={styles.stat}>
-          <div style={styles.statNumber}>8</div>
-          <div style={styles.statLabel}>Regioner</div>
+          <div style={styles.statNumber}>4–80</div>
+          <div style={styles.statLabel}>Spillere — alle størrelser</div>
         </div>
-        <div style={styles.divider} />
         <div style={styles.stat}>
-          <div style={styles.statNumber}>U8–U14</div>
-          <div style={styles.statLabel}>Aldersgrupper</div>
+          <div style={styles.statNumber}>100%</div>
+          <div style={styles.statLabel}>Gratis — ingen konto</div>
         </div>
-        <div style={styles.divider} />
         <div style={styles.stat}>
-          <div style={styles.statNumber}>2026</div>
-          <div style={styles.statLabel}>Sæson</div>
+          <div style={styles.statNumber}>Alle</div>
+          <div style={styles.statLabel}>Møder alle — hver runde</div>
         </div>
       </div>
     </section>
